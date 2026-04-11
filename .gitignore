@@ -1,0 +1,20 @@
+# 编译产物
+bin/
+obj/
+
+# 本地运行缓存
+.dotnet/
+GameRoot/
+
+# IDE 配置
+.idea/
+.vs/
+*.user
+*.suo
+*.DotSettings.user
+RiderModule.iml
+_ReSharper.Caches/
+
+# NuGet 与日志
+packages/
+*.log
