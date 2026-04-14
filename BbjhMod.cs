@@ -42,7 +42,7 @@ namespace bbjhmod
         {
             private static void Postfix(ref int __result)
             {
-                __result = 0;
+                __result = 1;
             }
         }
 
@@ -100,28 +100,47 @@ namespace bbjhmod
                 }
 
                 List<Vector3> anchorPositions = new List<Vector3>();
-                int anchorCount = Mathf.Min(5, trSlots.childCount);
+                int anchorCount = Mathf.Min(BuiltInShopSlotCount, trSlots.childCount);
                 for (int i = 0; i < anchorCount; i++)
                 {
                     anchorPositions.Add(trSlots.GetChild(i).position);
                 }
 
-                Vector3 first = anchorPositions[0];
-                float horizontalGap = (anchorPositions.Count > 1)
-                    ? Mathf.Abs(anchorPositions[1].x - anchorPositions[0].x)
-                    : 120f;
+                List<float> sortedX = anchorPositions.Select(v => v.x).OrderBy(v => v).ToList();
+                float minX = sortedX.First();
+                float maxX = sortedX.Last();
+                float horizontalGap = 120f;
+                if (sortedX.Count > 1)
+                {
+                    List<float> gaps = new List<float>();
+                    for (int i = 1; i < sortedX.Count; i++)
+                    {
+                        float gap = sortedX[i] - sortedX[i - 1];
+                        if (gap > 1f)
+                        {
+                            gaps.Add(gap);
+                        }
+                    }
+                    if (gaps.Count > 0)
+                    {
+                        horizontalGap = gaps.Average();
+                    }
+                }
+
                 float centerY = anchorPositions.Average(v => v.y);
-                float leftX = first.x - horizontalGap * 0.2f;
-                float topY = centerY + horizontalGap * 0.52f;
-                float bottomY = centerY - horizontalGap * 0.52f;
-                float columnGap = horizontalGap * 1.05f;
+                float columnGap = horizontalGap * 1.36f;
+                float rightX = maxX - horizontalGap * 1.2f;
+                float leftX = rightX - columnGap * 3f;
+                float topY = centerY + horizontalGap * 0.68f;
+                float bottomY = centerY - horizontalGap * 0.68f;
+                float z = anchorPositions[0].z;
 
                 for (int i = 0; i < slotCount; i++)
                 {
                     int column = i % 4;
                     int row = i / 4;
                     float y = (row == 0) ? topY : bottomY;
-                    positions[i] = new Vector3(leftX + columnGap * column, y, first.z);
+                    positions[i] = new Vector3(leftX + columnGap * column, y, z);
                 }
 
                 return positions;
